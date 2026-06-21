@@ -1,0 +1,10 @@
+*
+
+!assignment_face_v2/
+!assignment_face_v2/**
+!pyproject.toml
+!.python-version
+!uv.lock
+!README.md
+
+!.gitignore
