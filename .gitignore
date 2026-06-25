@@ -8,3 +8,8 @@
 !README.md
 
 !.gitignore
+
+# Python
+*.py[cod]
+*$py.class
+__pycache__/
