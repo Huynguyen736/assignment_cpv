@@ -1,6 +1,6 @@
-# Hướng dẫn sử dụng `assignment_face_v2`
+# Hướng dẫn sử dụng `assignment_face`
 
-`assignment_face_v2` là ứng dụng điểm danh bằng nhận diện khuôn mặt viết bằng Streamlit. Ứng dụng hỗ trợ:
+`assignment_face` là ứng dụng điểm danh bằng nhận diện khuôn mặt viết bằng Streamlit. Ứng dụng hỗ trợ:
 
 - đăng ký sinh viên bằng video 10 giây,
 - tách và lưu các mẫu khuôn mặt hợp lệ,
@@ -23,7 +23,7 @@ uv sync
 Nếu dùng `pip`:
 
 ```bash
-pip install -r assignment_face_v2/requirements.txt
+pip install -r assignment_face/requirements.txt
 ```
 
 ## 2. Cấu hình
@@ -31,7 +31,7 @@ pip install -r assignment_face_v2/requirements.txt
 Tạo file `.env` cho module:
 
 ```bash
-copy assignment_face_v2/.env.example assignment_face_v2/.env
+copy assignment_face/.env.example assignment_face/.env
 ```
 
 Nội dung mẫu:
@@ -58,7 +58,7 @@ Lưu ý:
 Chạy toàn bộ app:
 
 ```bash
-streamlit run assignment_face_v2/app.py
+streamlit run assignment_face/app.py
 ```
 
 Sau khi chạy, app có 3 màn hình chính:
@@ -83,8 +83,8 @@ Hệ thống sẽ:
 - lấy tối đa 5 frame mỗi giây,
 - chỉ giữ các frame có đúng 1 khuôn mặt,
 - bỏ các frame quá giống nhau,
-- lưu các ảnh khuôn mặt vào `assignment_face_v2/database/face_db/<student_id>/`,
-- cập nhật `assignment_face_v2/database/students.json`,
+- lưu các ảnh khuôn mặt vào `assignment_face/database/face_db/<student_id>/`,
+- cập nhật `assignment_face/database/students.json`,
 - train lại recognizer sau khi lưu xong.
 
 Nếu không thu được frame hợp lệ, app sẽ báo lỗi `No valid distinct face frames found in the 10-second recording`.
@@ -104,7 +104,7 @@ Kết quả có thể rơi vào các trạng thái:
 Dữ liệu điểm danh được ghi vào:
 
 ```text
-assignment_face_v2/database/attendance.csv
+assignment_face/database/attendance.csv
 ```
 
 Mỗi sinh viên chỉ được ghi 1 lần mỗi ngày.
@@ -113,12 +113,12 @@ Mỗi sinh viên chỉ được ghi 1 lần mỗi ngày.
 
 Thư mục/file quan trọng:
 
-- `assignment_face_v2/database/students.json`: danh sách sinh viên.
-- `assignment_face_v2/database/face_db/`: ảnh khuôn mặt đã đăng ký.
-- `assignment_face_v2/database/attendance.csv`: lịch sử điểm danh.
-- `assignment_face_v2/models/lbph_model.npz`: model nhận diện.
-- `assignment_face_v2/models/lbph_fallback.npz`: fallback descriptor model.
-- `assignment_face_v2/models/label_map.json`: map giữa `student_id` và tên.
+- `assignment_face/database/students.json`: danh sách sinh viên.
+- `assignment_face/database/face_db/`: ảnh khuôn mặt đã đăng ký.
+- `assignment_face/database/attendance.csv`: lịch sử điểm danh.
+- `assignment_face/models/lbph_model.npz`: model nhận diện.
+- `assignment_face/models/lbph_fallback.npz`: fallback descriptor model.
+- `assignment_face/models/label_map.json`: map giữa `student_id` và tên.
 
 Nếu chưa có model, trang `Live Attendance` sẽ yêu cầu đăng ký sinh viên và train trước khi nhận diện.
 

@@ -1,10 +1,15 @@
 *
 
-!assignment_face_v2/
-!assignment_face_v2/**
+!assignment_face/
+!assignment_face/**
 !pyproject.toml
 !.python-version
 !uv.lock
 !README.md
 
 !.gitignore
+
+# Python
+*.py[cod]
+*$py.class
+__pycache__/
