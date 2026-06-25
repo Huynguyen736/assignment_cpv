@@ -9,6 +9,7 @@ from assignment_face.core.detector import FaceDetector
 from assignment_face.core.preprocess import preprocess_frame
 from assignment_face.core.recognizer import FaceRecognizer
 from assignment_face.core.register import StudentRegistrar
+from assignment_face.core.crop_video import sample_recording_frames
 from assignment_face.utils.file_utils import ensure_project_structure
 
 
@@ -51,27 +52,7 @@ def _register_face_sample(
     }
 
 
-def sample_recording_frames(
-    frames: list[dict[str, Any]],
-    duration_seconds: int = 10,
-    frames_per_second: int = 5,
-) -> list[dict[str, Any]]:
-    if not frames:
-        return []
 
-    sampled: list[dict[str, Any]] = []
-    for second_index in range(duration_seconds):
-        start = float(second_index)
-        end = float(second_index + 1)
-        bucket = [item for item in frames if start <= float(item["timestamp"]) < end]
-        if not bucket:
-            continue
-
-        max_items = min(frames_per_second, len(bucket))
-        positions = np.linspace(0, len(bucket) - 1, num=max_items, dtype=int)
-        for position in positions:
-            sampled.append(bucket[int(position)])
-    return sampled
 
 
 def deduplicate_face_samples(face_images: list[np.ndarray], similarity_threshold: float = 5.0) -> list[np.ndarray]:
