@@ -18,4 +18,10 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "streamlit>=1.46.0",
     "streamlit-webrtc>=0.63.11",
+    "streamlit>=1.46.0",
+    "streamlit-webrtc>=0.63.11",
+    "opencv-contrib-python>=4.13.0.92",
+    "numpy>=2.4.5",
+    "pandas>=3.0.3",
+    "python-dotenv>=1.1.1",
 ]
