@@ -32,7 +32,6 @@ except Exception:  # pragma: no cover - runtime dependency fallback
     av = None
     WebRtcMode = None
     webrtc_streamer = None
-
 def create_recording_capture_state(duration_seconds: int = 10, frames_per_second: int = 5) -> dict[str, Any]:
     return {
         "duration_seconds": duration_seconds,
