@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 
-import cv2
 import numpy as np
 
 from assignment_face.config.settings import AppSettings
@@ -68,8 +67,7 @@ class FaceRecognizer:
         self.descriptors: np.ndarray | None = None
         self.student_ids: list[str] = []
         self.student_names: dict[str, str] = {}
-        self.label_to_student_id: dict[int, str] = {}
-        self.backend = "fallback-lbp"
+        self.backend = "internal-lbp"
 
     def _load_students(self) -> None:
         self.student_names = {student["id"]: student["name"] for student in load_students(self.settings.students_path)}
@@ -92,10 +90,6 @@ class FaceRecognizer:
         if not records:
             raise ValueError("No face images found in the face database.")
 
-        grouped_records: dict[str, list[np.ndarray]] = {}
-        for student_id, image in records:
-            grouped_records.setdefault(student_id, []).append(ensure_grayscale(image))
-
         self.student_ids = [student_id for student_id, _ in records]
         self.descriptors = np.vstack(
             [compute_lbp_descriptor(ensure_grayscale(image), grid_size=self.grid_size) for _, image in records]
@@ -105,93 +99,66 @@ class FaceRecognizer:
             json.dumps(self.student_names, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
+        model_payload = {
+            "descriptors": self.descriptors,
+            "student_ids": np.array(self.student_ids, dtype=object),
+            "grid_size": np.array(self.grid_size),
+        }
+        np.savez(
+            self.settings.model_path,
+            **model_payload,
+        )
         np.savez(
             self.settings.fallback_model_path,
-            descriptors=self.descriptors,
-            student_ids=np.array(self.student_ids, dtype=object),
-            grid_size=np.array(self.grid_size),
+            **model_payload,
         )
 
-        if hasattr(cv2, "face") and hasattr(cv2.face, "LBPHFaceRecognizer_create"):
-            recognizer = cv2.face.LBPHFaceRecognizer_create()
-            faces: list[np.ndarray] = []
-            labels: list[int] = []
-            self.label_to_student_id = {}
-            for label, student_id in enumerate(sorted(grouped_records)):
-                self.label_to_student_id[label] = student_id
-                for image in grouped_records[student_id]:
-                    faces.append(image)
-                    labels.append(label)
-            recognizer.train(faces, np.array(labels, dtype=np.int32))
-            recognizer.save(str(self.settings.model_path))
-            self.backend = "opencv-lbph"
-        else:
-            np.savez(
-                self.settings.model_path,
-                descriptors=self.descriptors,
-                student_ids=np.array(self.student_ids, dtype=object),
-                grid_size=np.array(self.grid_size),
-            )
-            self.backend = "fallback-lbp"
-
+        self.backend = "internal-lbp"
         return TrainingResult(trained_images=len(records), students=len(set(self.student_ids)))
+
+    def _load_descriptor_payload(self, model_path: str) -> bool:
+        try:
+            payload = np.load(model_path, allow_pickle=True)
+        except Exception:
+            return False
+
+        self.descriptors = payload["descriptors"]
+        self.student_ids = [str(value) for value in payload["student_ids"].tolist()]
+        self.grid_size = tuple(int(value) for value in payload["grid_size"].tolist())
+        self.backend = "internal-lbp"
+        return True
 
     def _ensure_model_loaded(self) -> None:
         self._load_students()
-        if self.descriptors is not None and self.student_ids and self.backend in {"opencv-lbph", "fallback-lbp"}:
+        if self.descriptors is not None and self.student_ids and self.backend == "internal-lbp":
             return
         if not self.settings.model_path.exists() and not self.settings.fallback_model_path.exists():
             raise FileNotFoundError("Model file not found. Please train the recognizer first.")
 
-        if self.settings.fallback_model_path.exists():
-            payload = np.load(self.settings.fallback_model_path, allow_pickle=True)
-            self.descriptors = payload["descriptors"]
-            self.student_ids = [str(value) for value in payload["student_ids"].tolist()]
-            self.grid_size = tuple(int(value) for value in payload["grid_size"].tolist())
-
-        try:
-            payload = np.load(self.settings.model_path, allow_pickle=True)
-            self.backend = "fallback-lbp"
-        except Exception:
-            if not (hasattr(cv2, "face") and hasattr(cv2.face, "LBPHFaceRecognizer_create")):
-                raise FileNotFoundError("Model requires OpenCV contrib LBPH support, but cv2.face is unavailable.")
-            self.backend = "opencv-lbph"
-            self.label_to_student_id = {
-                index: student_id for index, student_id in enumerate(sorted(self.student_names))
-            }
+        model_loaded = False
+        if self.settings.model_path.exists():
+            model_loaded = self._load_descriptor_payload(str(self.settings.model_path))
+        if not model_loaded and self.settings.fallback_model_path.exists():
+            model_loaded = self._load_descriptor_payload(str(self.settings.fallback_model_path))
+        if not model_loaded:
+            raise FileNotFoundError("Stored recognizer model is incompatible. Please retrain the recognizer.")
 
     def recognize(self, face_image: np.ndarray) -> RecognitionResult:
         self._ensure_model_loaded()
         grayscale_face = ensure_grayscale(face_image)
-        fallback_student_id: str | None = None
-        fallback_distance: float | None = None
+        descriptor = compute_lbp_descriptor(grayscale_face, grid_size=self.grid_size)
+        best_by_student: dict[str, float] = {}
+        for student_id, reference in zip(self.student_ids, self.descriptors, strict=True):
+            distance = _chi_square_distance(descriptor, reference)
+            current = best_by_student.get(student_id)
+            if current is None or distance < current:
+                best_by_student[student_id] = distance
 
-        if self.descriptors is not None:
-            descriptor = compute_lbp_descriptor(grayscale_face, grid_size=self.grid_size)
-            best_by_student: dict[str, float] = {}
-            for student_id, reference in zip(self.student_ids, self.descriptors, strict=True):
-                distance = _chi_square_distance(descriptor, reference)
-                current = best_by_student.get(student_id)
-                if current is None or distance < current:
-                    best_by_student[student_id] = distance
-            fallback_student_id, fallback_distance = min(best_by_student.items(), key=lambda item: item[1])
+        if not best_by_student:
+            raise FileNotFoundError("Face descriptor model is unavailable.")
 
-        if self.backend == "opencv-lbph":
-            recognizer = cv2.face.LBPHFaceRecognizer_create()
-            recognizer.read(str(self.settings.model_path))
-            label, distance = recognizer.predict(grayscale_face)
-            student_id = self.label_to_student_id.get(int(label))
-            recognized = student_id is not None and distance <= self.settings.confidence_threshold
-            if not recognized and fallback_student_id is not None and fallback_distance is not None:
-                student_id = fallback_student_id
-                distance = fallback_distance
-                recognized = distance <= self.settings.confidence_threshold
-        else:
-            if fallback_student_id is None or fallback_distance is None:
-                raise FileNotFoundError("Fallback face descriptor model is unavailable.")
-            student_id = fallback_student_id
-            distance = fallback_distance
-            recognized = distance <= self.settings.confidence_threshold
+        student_id, distance = min(best_by_student.items(), key=lambda item: item[1])
+        recognized = distance <= self.settings.confidence_threshold
 
         return RecognitionResult(
             student_id=student_id if recognized else None,
