@@ -44,25 +44,25 @@ class HaarCascade:
 
     def compute_integral_images(self, img):
         img_float = img.astype(np.float64)
-        integral = img_float.cumsum(axis=0).cumsum(axis=1)
-        sq_integral = (img_float ** 2).cumsum(axis=0).cumsum(axis=1)
+        integral = img_float
+        sq_integral = img_float ** 2
         return integral, sq_integral
 
-    def get_region_sum(self, integral, x, y, w, h):
-        x0, y0 = int(x - 1), int(y - 1)
-        x1, y1 = int(x + w - 1), int(y + h - 1)
-        
-        sum_val = integral[y1, x1]
-        if y0 >= 0: sum_val -= integral[y0, x1]
-        if x0 >= 0: sum_val -= integral[y1, x0]
-        if y0 >= 0 and x0 >= 0: sum_val += integral[y0, x0]
+    def get_region_sum(self, img_array, x, y, w, h):
+        x_start = int(x)
+        y_start = int(y)
+        x_end = int(x + w)
+        y_end = int(y + h)
+        sum_val = 0.0
+        for i in range(y_start, y_end):
+            for j in range(x_start, x_end):
+                sum_val += img_array[i, j]    
         return sum_val
 
     def detect_multi_scale(self, img, scale_factor=1.2, step=4):
         h_img, w_img = img.shape
         detections = []
         scale = 1.0
-        
         while True:
             resized_w = int(w_img / scale)
             resized_h = int(h_img / scale)
@@ -77,11 +77,9 @@ class HaarCascade:
                 for x in range(0, resized_w - self.win_w, step):
                     win_sum = self.get_region_sum(integral, x, y, self.win_w, self.win_h)
                     win_sq_sum = self.get_region_sum(sq_integral, x, y, self.win_w, self.win_h)
-                    
                     mean = win_sum / self.win_area
                     variance = (win_sq_sum / self.win_area) - (mean ** 2)
-                    std_dev = np.sqrt(variance) if variance > 0 else 1.0
-                    
+                    std_dev = np.sqrt(variance) if variance > 0 else 1.0             
                     passed_all_stages = True
                     for stage_threshold, weaks in self.stages:
                         stage_sum = 0.0
