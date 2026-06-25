@@ -7,10 +7,7 @@ def sample_recording_frames(
     duration_seconds: int = 10,
     frames_per_second: int = 5,
 ) -> list[dict[str, Any]]:
-    """
-    Tách luồng video (danh sách các frames) thành các khung hình riêng biệt 
-    dựa trên fps được chỉ định (mặc định 5 fps).
-    """
+  
     if not frames:
         return []
 
