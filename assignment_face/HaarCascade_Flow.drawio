@@ -1,2 +1,405 @@
-<?xml version='1.0' encoding='utf-8'?>
-<mxfile host="Electron" version="21.6.8" type="device"><diagram id="flowchart_id" name="Flowchart"><mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3000" pageHeight="3000" math="0" shadow="0"><root><mxCell id="0" /><mxCell id="1" parent="0" /><mxCell id="hc" value="Class HaarCascade" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;opacity=90;fontStyle=1;fontSize=15;" vertex="1" parent="1"><mxGeometry x="50" y="597.5" width="140" height="60" as="geometry" /></mxCell><mxCell id="hc_init" value="Đọc file xml và nạp dữ liệu tham số đầu vào" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="170.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_hc_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc" target="hc_init"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_parse" value="Đọc cây XML bằng ET.parse&#10;Lấy nút gốc cascade (root.find)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="170.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_init_hc_init_parse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init" target="hc_init_parse"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_win" value="Lấy kích thước khung cửa sổ gốc từ XML&#10;Tính win_area = win_w * win_h" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="830" y="170.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_init_parse_hc_init_win" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_parse" target="hc_init_win"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_stages" value="Đọc cấu trúc các Tầng lọc (Stages) và Bộ phân loại yếu (Weak Classifiers)&#10;cascade.find('stages')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1090" y="170.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_init_win_hc_init_stages" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_win" target="hc_init_stages"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_weaks" value="Nạp các tham số của stage vào list" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1350" y="170.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_init_stages_hc_init_weaks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_stages" target="hc_init_weaks"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_thresh" value="stageThreshold" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1610" y="50.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_init_weaks_hc_init_thresh" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_weaks" target="hc_init_thresh"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_stg_val" value="stage_threshold" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;opacity=90;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1870" y="50" width="100" height="100" as="geometry" /></mxCell><mxCell id="edge_hc_init_thresh_hc_init_stg_val" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_thresh" target="hc_init_stg_val"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_weakClf" value="weakClassifiers" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1610" y="170.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_init_weaks_hc_init_weakClf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_weaks" target="hc_init_weakClf"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_internal" value="internalNodes" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1870" y="170.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_init_weakClf_hc_init_internal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_weakClf" target="hc_init_internal"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_leaf" value="feature_idx&#10;threshold&#10;left_val&#10;right_val" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;opacity=90;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2130" y="170" width="100" height="100" as="geometry" /></mxCell><mxCell id="edge_hc_init_internal_hc_init_leaf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_internal" target="hc_init_leaf"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_init_feats" value="Nạp các tham số của danh sách tọa độ&#10;(x,y,w,h) và weight của các hcn đặc trưng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1610" y="290" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_init_weaks_hc_init_feats" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_init_weaks" target="hc_init_feats"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_int" value="Tính toán Ảnh tích phân&#10;(compute_integral_images)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="470.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_hc_int" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc" target="hc_int"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_int_float" value="Ép kiểu ảnh sang float64 chống tràn số" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="470.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_int_hc_int_float" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_int" target="hc_int_float"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_int_cumsum1" value="Cộng dồn kết quả theo chiều ngang từ trái qua phải&#10;integral = cumsum(axis=0).cumsum(axis=1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="830" y="410" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_int_float_hc_int_cumsum1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_int_float" target="hc_int_cumsum1"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_int_cumsum2" value="Cộng dồn bình phương giá trị của từng pixel&#10;sq_integral = (img**2).cumsum(axis=0).cumsum(axis=1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="830" y="530" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_int_float_hc_int_cumsum2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_int_float" target="hc_int_cumsum2"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_sum" value="Tính tổng giá trị của tất cả các pixel&#10;nằm trong một vùng hình chữ nhật" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="650.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_hc_sum" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc" target="hc_sum"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_sum_calc" value="Cộng và trừ các đỉnh của hcn trên mảng cộng dồn&#10;sum = I[y1,x1] - I[y0,x1] - I[y1,x0] + I[y0,x0]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="650" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_sum_hc_sum_calc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_sum" target="hc_sum_calc"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms" value="Phát hiện khuôn mặt ở nhiều tỷ lệ khác nhau&#10;bằng cửa sổ trượt (Sliding Window)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="1025.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_hc_dms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc" target="hc_dms"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_init" value="Khởi tạo hệ số thu phóng scale = 1.0&#10;và danh sách chứa tọa độ mặt thô detections = []" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="1025.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_hc_dms_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms" target="hc_dms_init"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_loop" value="Vòng lặp thu nhỏ ảnh vô tận (while True)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="830" y="1025.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_dms_init_hc_dms_loop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_init" target="hc_dms_loop"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_break" value="Tính kích thước ảnh mới (w/scale, h/scale)&#10;Nếu nhỏ hơn 24x24 -&gt; Dừng (BREAK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1090" y="920.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_loop_hc_dms_break" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_loop" target="hc_dms_break"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_resize" value="Thực hiện thu nhỏ ảnh bằng cv2.resize" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1350" y="920.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_break_hc_dms_resize" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_break" target="hc_dms_resize"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_calcint" value="Tính lại ảnh tích phân (Integral Image)&#10;cho ảnh thu nhỏ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1610" y="920.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_resize_hc_dms_calcint" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_resize" target="hc_dms_calcint"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_slide" value="Trượt cửa sổ 24x24 pixel trên toàn bộ ảnh&#10;từ trái qua phải, từ trên xuống dưới (Bước=4)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1870" y="920.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_dms_calcint_hc_dms_slide" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_calcint" target="hc_dms_slide"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_var" value="Chuẩn hóa độ sáng bằng cách tính: trung bình (mean),&#10;phương sai (variance) và độ lệch chuẩn (std_dev)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2130" y="830.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_slide_hc_dms_var" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_slide" target="hc_dms_var"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_stgloop" value="Lặp qua toàn bộ các&#10;Giai đoạn lọc (Stages)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="2390" y="830.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_dms_var_hc_dms_stgloop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_var" target="hc_dms_stgloop"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_wkloop" value="Lặp qua từng Bộ phân loại yếu&#10;(Weak Classifiers) trong Stage" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="2650" y="770.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_hc_dms_stgloop_hc_dms_wkloop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_stgloop" target="hc_dms_wkloop"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_featval" value="Tính điểm Đặc trưng (feat_val) của vùng hiện tại&#10;thông qua các hình chữ nhật (x,y,w,h,weight)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2910" y="770.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_wkloop_hc_dms_featval" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_wkloop" target="hc_dms_featval"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_eval" value="So sánh: feat_val &lt; ngưỡng * độ lệch chuẩn?&#10;Đúng -&gt; Cộng left_val. Sai -&gt; Cộng right_val" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="3170" y="770" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_featval_hc_dms_eval" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_featval" target="hc_dms_eval"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_stgeval" value="Cộng tổng điểm (stage_sum).&#10;Nếu stage_sum &lt; stage_threshold -&gt; Trượt (BREAK)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2650" y="890" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_stgloop_hc_dms_stgeval" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_stgloop" target="hc_dms_stgeval"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_pass" value="Nếu vùng ảnh vượt qua TẤT CẢ các Giai đoạn&#10;-&gt; Nhân tọa độ với scale và lưu vào danh sách" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2130" y="1010" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_slide_hc_dms_pass" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_slide" target="hc_dms_pass"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="hc_dms_scale" value="Kết thúc lượt quét của 1 kích thước&#10;Tăng tỷ lệ thu nhỏ: scale *= scale_factor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1090" y="1130" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_hc_dms_loop_hc_dms_scale" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="hc_dms_loop" target="hc_dms_scale"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd" value="Class FaceDetector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;opacity=90;fontStyle=1;fontSize=15;" vertex="1" parent="1"><mxGeometry x="50" y="1360.0" width="140" height="60" as="geometry" /></mxCell><mxCell id="fd_init" value="Khởi tạo bộ nhận diện khuôn mặt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="1300.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_fd_fd_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd" target="fd_init"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_init_hc" value="Truyền đường dẫn XML để&#10;tạo đối tượng HaarCascade" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="1300.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_init_fd_init_hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_init" target="fd_init_hc"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_init_sz" value="Lưu kích thước khuôn mặt đầu ra&#10;(Ví dụ: 112x112)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="830" y="1300" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_init_hc_fd_init_sz" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_init_hc" target="fd_init_sz"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det" value="Xử lý luồng Camera,&#10;lọc nhiễu và cắt ảnh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" vertex="1" parent="1"><mxGeometry x="310" y="1420.0" width="170" height="60" as="geometry" /></mxCell><mxCell id="edge_fd_fd_det" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd" target="fd_det"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_gray" value="Chuyển ảnh màu (BGR) sang Đơn sắc (Grayscale)&#10;để giảm thiểu sai số ánh sáng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="1420.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_fd_det_gray" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det" target="fd_det_gray"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_raw" value="Đẩy ảnh xám vào bộ phát hiện HaarCascade&#10;để nhận về danh sách tọa độ chồng chéo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="830" y="1420.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_gray_fd_det_raw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_gray" target="fd_det_raw"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_filt" value="Tính Width và Height của từng hộp tọa độ.&#10;Loại bỏ các khuôn mặt quá nhỏ (&lt; 60x60)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1090" y="1420.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_raw_fd_det_filt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_raw" target="fd_det_filt"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_nms" value="Tiến hành Gom cụm NMS (cv2.groupRectangles)&#10;để gộp các hộp đè lên nhau" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1350" y="1420.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_filt_fd_det_nms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_filt" target="fd_det_nms"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_crop" value="Lặp qua danh sách các hộp&#10;tọa độ chuẩn cuối cùng" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1610" y="1420.0" width="110" height="60" as="geometry" /></mxCell><mxCell id="edge_fd_det_nms_fd_det_crop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_nms" target="fd_det_crop"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_slice" value="Sử dụng Numpy Slicing để cắt mảng ảnh (crop)&#10;face = gray[y:y+h, x:x+w]&#10;Thu phóng ảnh về đúng kích cỡ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1870" y="1420.0" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_crop_fd_det_slice" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_crop" target="fd_det_slice"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="fd_det_ret" value="Trả về danh sách mảng&#10;ảnh khuôn mặt và tọa độ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="2130" y="1420" width="190" height="70" as="geometry" /></mxCell><mxCell id="edge_fd_det_slice_fd_det_ret" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" edge="1" parent="1" source="fd_det_slice" target="fd_det_ret"><mxGeometry relative="1" as="geometry" /></mxCell></root></mxGraphModel></diagram></mxfile>
+<mxfile host="app.diagrams.net">
+  <diagram id="flowchart_id" name="Flowchart">
+    <mxGraphModel dx="2555" dy="1540" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3000" pageHeight="3000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;opacity=90;fontStyle=1;fontSize=15;" value="Class HaarCascade" vertex="1">
+          <mxGeometry height="60" width="140" x="50" y="597.5" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" value="Đọc file xml và nạp dữ liệu tham số đầu vào" vertex="1">
+          <mxGeometry height="60" width="170" x="310" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_hc_init" edge="1" parent="1" source="hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hc_init_parse" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Đọc cây XML bằng ET.parse&#xa;Lấy nút gốc cascade (root.find)" vertex="1">
+          <mxGeometry height="70" width="190" x="570" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_hc_init_parse" edge="1" parent="1" source="hc_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_parse">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_win" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Lấy kích thước khung cửa sổ gốc từ XML&#xa;Tính win_area = win_w * win_h" vertex="1">
+          <mxGeometry height="70" width="190" x="830" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_parse_hc_init_win" edge="1" parent="1" source="hc_init_parse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_win">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_stages" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Đọc cấu trúc các Tầng lọc (Stages) và Bộ phân loại yếu (Weak Classifiers)&#xa;cascade.find(&#39;stages&#39;)" vertex="1">
+          <mxGeometry height="70" width="190" x="1090" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_win_hc_init_stages" edge="1" parent="1" source="hc_init_win" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_stages">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_weaks" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Nạp các tham số của stage vào list" vertex="1">
+          <mxGeometry height="70" width="190" x="1350" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_stages_hc_init_weaks" edge="1" parent="1" source="hc_init_stages" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_weaks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_thresh" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" value="stageThreshold" vertex="1">
+          <mxGeometry height="60" width="110" x="1610" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_weaks_hc_init_thresh" edge="1" parent="1" source="hc_init_weaks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.576;exitY=-0.047;exitDx=0;exitDy=0;exitPerimeter=0;" target="hc_init_thresh">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1459" y="80" />
+            </Array>
+            <mxPoint x="1435" y="150" as="sourcePoint" />
+            <mxPoint x="1560" y="55" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hc_init_stg_val" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;opacity=90;fontSize=11;fontStyle=1;" value="stage_threshold" vertex="1">
+          <mxGeometry height="100" width="100" x="1875" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_thresh_hc_init_stg_val" edge="1" parent="1" source="hc_init_thresh" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_stg_val">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_weakClf" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" value="weakClassifiers" vertex="1">
+          <mxGeometry height="60" width="110" x="1610" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_weaks_hc_init_weakClf" edge="1" parent="1" source="hc_init_thresh" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="hc_init_weakClf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_internal" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" value="internalNodes" vertex="1">
+          <mxGeometry height="60" width="110" x="1870" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_weakClf_hc_init_internal" edge="1" parent="1" source="hc_init_weakClf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_internal">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_leaf" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;opacity=90;fontSize=11;fontStyle=1;" value="feature_idx&#xa;threshold&#xa;left_val&#xa;right_val" vertex="1">
+          <mxGeometry height="100" width="100" x="2130" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_internal_hc_init_leaf" edge="1" parent="1" source="hc_init_internal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_leaf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_init_feats" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Nạp các tham số của danh sách tọa độ&#xa;(x,y,w,h) và weight của các hcn đặc trưng" vertex="1">
+          <mxGeometry height="70" width="190" x="1350" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_init_weaks_hc_init_feats" edge="1" parent="1" source="hc_init_weaks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_init_feats">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hc_int" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" value="Tính toán Ảnh tích phân&#xa;(compute_integral_images)" vertex="1">
+          <mxGeometry height="60" width="170" x="240" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_hc_int" edge="1" parent="1" source="hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="hc_int">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="120" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-40" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font face=&quot;Arial&quot;&gt;&lt;span style=&quot;font-size: 8px;&quot;&gt;&lt;b&gt;Ép kiểu ảnh sang float64 chống tràn số&amp;nbsp;&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="500" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-41" edge="1" parent="1" source="hc_int" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-40">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="400" y="130" as="sourcePoint" />
+            <mxPoint x="540" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-42" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;fontSize=11;fontStyle=1;" value="&lt;div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;Cộng dồn kết quả theo chiều ngang từ trái qua phải&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;integral = cumsum(axis=0)&lt;br&gt;.cumsum(axis=1)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="680" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-43" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-42">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="380" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_hc_hc_sum" edge="1" parent="1" source="hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-49">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="310" y="680.04" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-44" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;fontSize=11;fontStyle=1;" value="&lt;div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Cộng dồn b&lt;/span&gt;ình phương giá trị của từng pixel từ trái qua phải chiều ngang&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;sq_integral = (img**2)&lt;br&gt;.cumsum(axis=0).cumsum(axis=1)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="680" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-45" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-44">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="650" y="380" />
+              <mxPoint x="650" y="435" />
+            </Array>
+            <mxPoint x="620" y="380" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-47" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=70;" value="&lt;b data-path-to-node=&quot;0&quot; data-index-in-node=&quot;126&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Tính tổng giá trị của tất cả các pixel nằm trong một vùng hình chữ nhật ở mỗi stage&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="100" width="170" x="250" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_hc_hc_dms" edge="1" parent="1" source="hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-47">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="395" y="1025" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-49" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=70;" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Phát hiện khuôn mặt ở nhiều tỷ lệ khác nhau&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;bằng Sliding Window&lt;/span&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="190" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-50" edge="1" parent="1" source="hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-49">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="85" y="770" />
+            </Array>
+            <mxPoint x="60" y="330" as="sourcePoint" />
+            <mxPoint x="230" y="761" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-51" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Khởi tạo hệ số thu phóng ban đầu scale = 1.0&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;và danh sách chứa tọa độ mặt thô detections = []&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="480" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-52" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-51">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="420" y="370" as="sourcePoint" />
+            <mxPoint x="560" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-55" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Lấy tọa độ của các hình chữ nhật ở các feature mỗi stage để tính tổng" vertex="1">
+          <mxGeometry height="30" width="200" x="820" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-57" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;" value="&lt;b&gt;&lt;font style=&quot;font-size: 7px;&quot;&gt;Thiết lập vòng lặp while cho đến khi ảnh gốc còn nhỏ hơn khung quét&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="80" width="80" x="670" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-58" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-57">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="560" y="760" as="sourcePoint" />
+            <mxPoint x="680" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-59" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-weight: 700;&quot;&gt;Tính kích thước ảnh mới (w/scale, h/scale)&lt;/span&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="800" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-60" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-59">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="620" y="730" as="sourcePoint" />
+            <mxPoint x="690" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-61" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;&lt;font style=&quot;font-size: 5px;&quot;&gt;Nếu nhỏ hơn 24x24 -&amp;gt; Dừng (BREAK)&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="80" x="820" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-63" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-61" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;startArrow=classic;startFill=1;" target="pahPvx7830LjF92T2VmS-59" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="870" y="780" as="sourcePoint" />
+            <mxPoint x="920" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-64" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-65">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="780" y="770" as="sourcePoint" />
+            <mxPoint x="990" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-65" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-weight: 700;&quot;&gt;Thực hiện thu nhỏ ảnh bằng cv2.resize&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="960" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-66" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-weight: 700;&quot;&gt;Tính lại ảnh tích phân (Integral Image)&lt;/span&gt;&lt;br style=&quot;font-size: 11px; font-weight: 700;&quot;&gt;&lt;span style=&quot;font-size: 11px; font-weight: 700;&quot;&gt;cho ảnh thu nhỏ&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1120" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-67" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-66">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="940" y="670" as="sourcePoint" />
+            <mxPoint x="980" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-68" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Trượt cửa sổ 24x24 pixel trên toàn bộ ảnh&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;từ trái qua phải, từ trên xuống dưới (Bước nhảy pixel =4)&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1280" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-69" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-66" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-68">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1240" y="670" as="sourcePoint" />
+            <mxPoint x="1130" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-70" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 7px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Chuẩn hóa độ sáng bằng &lt;/span&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;độ lệch chuẩn (std_dev)&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1440" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-71" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-70">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1260" y="670" as="sourcePoint" />
+            <mxPoint x="1300" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-72" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;b style=&quot;font-size: 7px;&quot;&gt;Thiết lập các chỉ số đánh giá&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 7px;&quot;&gt;Lặp qua các weke &lt;/b&gt;&lt;span style=&quot;font-size: 7px;&quot;&gt;&lt;b&gt;classifiers&lt;/b&gt;&lt;/span&gt;&lt;b style=&quot;font-size: 7px;&quot;&gt;&amp;nbsp;trong các stage&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1440" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-73" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-72">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1420" y="660" as="sourcePoint" />
+            <mxPoint x="1460" y="660" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-74" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Tính điểm Đặc trưng (feat_val) của vùng hiện tại&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;thông qua các hình chữ nhật (x,y,w,h,weight)&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1280" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-75" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-72" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-74">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1500" y="710" as="sourcePoint" />
+            <mxPoint x="1500" y="740" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-76" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 7px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;So sánh: feat_val &amp;lt; ngưỡng * độ lệch chuẩn&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Đúng -&amp;gt; Cộng left_val. Sai -&amp;gt; Cộng right_val&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="1120" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-77" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-76">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1460" y="760" as="sourcePoint" />
+            <mxPoint x="1420" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-78" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 7px;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;So sánh: feat_val &amp;lt; ngưỡng * độ lệch chuẩn&lt;/span&gt;&lt;br style=&quot;font-weight: 700;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;Đúng -&amp;gt; Cộng left_val. Sai -&amp;gt; Cộng right_val&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="960" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-79" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" target="pahPvx7830LjF92T2VmS-78">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="1290" y="750" as="sourcePoint" />
+            <mxPoint x="1250" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-80" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 7px;&quot;&gt;&lt;b&gt;So sánh tổng điểm stage_sum với ngưỡng qua cửa của tầng đó stage_threshold&lt;br&gt;&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="810" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="fd" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;opacity=90;fontStyle=1;fontSize=15;" value="Class FaceDetector" vertex="1">
+          <mxGeometry height="60" width="140" x="50" y="1360" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-81" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-80">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="940" y="760" />
+              <mxPoint x="940" y="830" />
+            </Array>
+            <mxPoint x="1120" y="760" as="sourcePoint" />
+            <mxPoint x="1080" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fd_init" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" value="Khởi tạo bộ nhận diện khuôn mặt" vertex="1">
+          <mxGeometry height="60" width="170" x="310" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-82" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6d8764;fontColor=#ffffff;strokeColor=#3A5431;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-weight: 700;&quot;&gt;&lt;font style=&quot;font-size: 5px;&quot;&gt;Nếu nhỏ hơn ngưỡng tầng&lt;br&gt;hủy toàn bộ tầng sau -&amp;gt; dịch chuyển sang cửa sổ tiếp theo&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="80" x="830" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_fd_init" edge="1" parent="1" source="fd" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_init">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-83" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-82" style="endArrow=none;dashed=1;html=1;rounded=0;startArrow=classic;startFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-80" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="980" y="830" as="sourcePoint" />
+            <mxPoint x="910" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fd_init_hc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Truyền đường dẫn XML để&#xa;tạo đối tượng HaarCascade" vertex="1">
+          <mxGeometry height="70" width="190" x="570" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-84" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=70;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 7px;&quot;&gt;&lt;b&gt;Ghi nhận khuôn mặt và lưu tọa độ&lt;br&gt;vào&amp;nbsp;&lt;/b&gt;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; font-size: 7px;&quot;&gt;&lt;b&gt;detections&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="960" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_init_fd_init_hc" edge="1" parent="1" source="fd_init" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_init_hc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-85" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="pahPvx7830LjF92T2VmS-84">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="920" y="880" />
+            </Array>
+            <mxPoint x="920" y="860" as="sourcePoint" />
+            <mxPoint x="950" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fd_init_sz" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Lưu kích thước khuôn mặt đầu ra" vertex="1">
+          <mxGeometry height="70" width="190" x="830" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-86" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1016" y="961" />
+              <mxPoint x="711" y="961" />
+              <mxPoint x="711" y="780" />
+            </Array>
+            <mxPoint x="1015.53" y="911.4599999999999" as="sourcePoint" />
+            <mxPoint x="711" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_fd_init_hc_fd_init_sz" edge="1" parent="1" source="fd_init_hc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_init_sz">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-87" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Tiếp tục giảm pixel bức ảnh gốc" vertex="1">
+          <mxGeometry height="30" width="230" x="730" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;opacity=90;fontStyle=1;fontSize=12;" value="Xử lý luồng Camera,&#xa;lọc nhiễu và cắt ảnh" vertex="1">
+          <mxGeometry height="60" width="170" x="310" y="1420" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_fd_det" edge="1" parent="1" source="fd" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_gray" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Chuyển ảnh màu (BGR) sang Đơn sắc (Grayscale)&#xa;để giảm thiểu sai số ánh sáng" vertex="1">
+          <mxGeometry height="70" width="190" x="590" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_fd_det_gray" edge="1" parent="1" source="fd_det" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_gray">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_raw" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Đẩy ảnh xám vào bộ phát hiện HaarCascade&#xa;để nhận về danh sách tọa độ chồng chéo" vertex="1">
+          <mxGeometry height="70" width="190" x="840" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_gray_fd_det_raw" edge="1" parent="1" source="fd_det_gray" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_filt" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Tính Width và Height của từng hộp tọa độ.&#xa;Loại bỏ các khuôn mặt quá nhỏ (&lt; 60x60)" vertex="1">
+          <mxGeometry height="70" width="190" x="1100" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_raw_fd_det_filt" edge="1" parent="1" source="fd_det_raw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_filt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_nms" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Tiến hành Gom cụm NMS (cv2.groupRectangles)&#xa;để gộp các hộp đè lên nhau" vertex="1">
+          <mxGeometry height="70" width="190" x="1360" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_filt_fd_det_nms" edge="1" parent="1" source="fd_det_filt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_nms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_crop" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fa6800;fontColor=#ffffff;strokeColor=#C73500;opacity=90;fontStyle=1;fontSize=11;" value="&lt;font style=&quot;font-size: 7px;&quot;&gt;Lặp qua danh sách các hộp&lt;br&gt;tọa độ chuẩn cuối cùng&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="110" x="1660" y="1420" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_nms_fd_det_crop" edge="1" parent="1" source="fd_det_nms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_crop">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_slice" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Sử dụng Numpy Slicing để cắt mảng ảnh (crop)&#xa;face = gray[y:y+h, x:x+w]&#xa;Thu phóng ảnh về đúng kích cỡ" vertex="1">
+          <mxGeometry height="70" width="190" x="1870" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_crop_fd_det_slice" edge="1" parent="1" source="fd_det_crop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_slice">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fd_det_ret" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;opacity=90;align=center;fontSize=11;fontStyle=1;" value="Trả về danh sách mảng&#xa;ảnh khuôn mặt và tọa độ" vertex="1">
+          <mxGeometry height="70" width="190" x="2130" y="1415" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_fd_det_slice_fd_det_ret" edge="1" parent="1" source="fd_det_slice" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4D4D4D;" target="fd_det_ret">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="pahPvx7830LjF92T2VmS-112" edge="1" parent="1" source="pahPvx7830LjF92T2VmS-47" style="endArrow=none;dashed=1;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" target="hc_init_feats" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="680" y="650" as="sourcePoint" />
+            <mxPoint x="730" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uQfIKRyZL2_9FAGzDH4T-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" value="&lt;span style=&quot;color: rgb(18, 18, 18); font-weight: 700;&quot;&gt;&lt;font style=&quot;font-size: 43px;&quot;&gt;Class HaarCascade&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="180" width="420" x="50" y="1780" as="geometry" />
+        </mxCell>
+        <mxCell id="uQfIKRyZL2_9FAGzDH4T-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#60a917;fontColor=#ffffff;strokeColor=#2D7600;" value="&lt;span style=&quot;color: rgb(18, 18, 18); font-weight: 700;&quot;&gt;&lt;font style=&quot;font-size: 43px;&quot;&gt;Xử lý nạp dữ liệu&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="180" width="420" x="660" y="1780" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
