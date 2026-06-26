@@ -1,17 +1,13 @@
-from __future__ import annotations
-from typing import Any
-import numpy as np
-
 def sample_recording_frames(
-    frames: list[dict[str, Any]],
+    frames: list[dict],
     duration_seconds: int = 10,
     frames_per_second: int = 5,
-) -> list[dict[str, Any]]:
-  
+) -> list[dict]:
+
     if not frames:
         return []
 
-    sampled: list[dict[str, Any]] = []
+    sampled = []
     for second_index in range(duration_seconds):
         start = float(second_index)
         end = float(second_index + 1)
@@ -20,7 +16,9 @@ def sample_recording_frames(
             continue
 
         max_items = min(frames_per_second, len(bucket))
-        positions = np.linspace(0, len(bucket) - 1, num=max_items, dtype=int)
+        step = len(bucket) / max_items
+        positions = [int(i * step) for i in range(max_items)]
         for position in positions:
-            sampled.append(bucket[int(position)])
+            sampled.append(bucket[position])
+
     return sampled
