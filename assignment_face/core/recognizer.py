@@ -222,7 +222,7 @@ class FaceRecognizer:
             raise FileNotFoundError("Face descriptor model is unavailable.")
 
         student_id, distance = min(best_by_student.items(), key=lambda item: item[1])
-        recognized = distance <= self.settings.confidence_threshold
+        recognized = distance <= (100 - self.settings.confidence_threshold)
         reference_index = best_reference_index_by_student[student_id]
         reference_image_path = self.image_paths[reference_index] if reference_index < len(self.image_paths) else None
         reference_image = load_face_image(reference_image_path) if reference_image_path else None
@@ -231,7 +231,7 @@ class FaceRecognizer:
         return RecognitionResult(
             student_id=student_id if recognized else None,
             student_name=self.student_names.get(student_id) if recognized else None,
-            confidence=round(float(distance), 4),
+            confidence=round(max(0, 100 - distance), 4),
             recognized=recognized,
             reference_image_path=reference_image_path,
             reference_lbp_input=reference_lbp_input,
