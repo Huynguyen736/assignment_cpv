@@ -9,6 +9,34 @@ from assignment_face.config.settings import AppSettings
 from assignment_face.utils.file_utils import load_students
 from assignment_face.utils.image_utils import ensure_grayscale, load_face_image
 
+UNIFORM_LBP_BINS = 59
+NON_UNIFORM_LBP_BIN = UNIFORM_LBP_BINS - 1
+LBP_VARIANT = "uniform-lbp-u2-p8-r1"
+
+
+def _is_uniform_lbp_code(code: int) -> bool:
+    transitions = 0
+    previous_bit = (code >> 7) & 1
+    for bit in range(8):
+        current_bit = (code >> bit) & 1
+        if current_bit != previous_bit:
+            transitions += 1
+        previous_bit = current_bit
+    return transitions <= 2
+
+
+def _build_uniform_lbp_lookup() -> np.ndarray:
+    lookup = np.full(256, NON_UNIFORM_LBP_BIN, dtype=np.uint8)
+    next_bin = 0
+    for code in range(256):
+        if _is_uniform_lbp_code(code):
+            lookup[code] = next_bin
+            next_bin += 1
+    return lookup
+
+
+_UNIFORM_LBP_LOOKUP = _build_uniform_lbp_lookup()
+
 
 def _compute_lbp_codes(face_image: np.ndarray) -> np.ndarray:
     image = face_image.astype(np.uint8)
@@ -26,7 +54,7 @@ def _compute_lbp_codes(face_image: np.ndarray) -> np.ndarray:
     lbp = np.zeros(center.shape, dtype=np.uint8)
     for bit, neighbor in enumerate(neighbors):
         lbp |= ((neighbor >= center).astype(np.uint8) << bit)
-    return lbp
+    return _UNIFORM_LBP_LOOKUP[lbp]
 
 
 def compute_lbp_descriptor(face_image: np.ndarray, grid_size: tuple[int, int] = (8, 8)) -> np.ndarray:
@@ -34,7 +62,7 @@ def compute_lbp_descriptor(face_image: np.ndarray, grid_size: tuple[int, int] = 
     histograms: list[np.ndarray] = []
     for row in np.array_split(lbp, grid_size[1], axis=0):
         for cell in np.array_split(row, grid_size[0], axis=1):
-            histogram = np.bincount(cell.ravel(), minlength=256).astype(np.float32)
+            histogram = np.bincount(cell.ravel(), minlength=UNIFORM_LBP_BINS).astype(np.float32)
             histogram /= histogram.sum() + 1e-6
             histograms.append(histogram)
     return np.concatenate(histograms)
@@ -67,7 +95,7 @@ class FaceRecognizer:
         self.descriptors: np.ndarray | None = None
         self.student_ids: list[str] = []
         self.student_names: dict[str, str] = {}
-        self.backend = "internal-lbp"
+        self.backend = "internal-uniform-lbp"
 
     def _load_students(self) -> None:
         self.student_names = {student["id"]: student["name"] for student in load_students(self.settings.students_path)}
@@ -103,6 +131,7 @@ class FaceRecognizer:
             "descriptors": self.descriptors,
             "student_ids": np.array(self.student_ids, dtype=object),
             "grid_size": np.array(self.grid_size),
+            "lbp_variant": np.array(LBP_VARIANT),
         }
         np.savez(
             self.settings.model_path,
@@ -113,24 +142,31 @@ class FaceRecognizer:
             **model_payload,
         )
 
-        self.backend = "internal-lbp"
+        self.backend = "internal-uniform-lbp"
         return TrainingResult(trained_images=len(records), students=len(set(self.student_ids)))
 
     def _load_descriptor_payload(self, model_path: str) -> bool:
         try:
             payload = np.load(model_path, allow_pickle=True)
+            if str(payload["lbp_variant"].tolist()) != LBP_VARIANT:
+                return False
+            grid_size = tuple(int(value) for value in payload["grid_size"].tolist())
+            descriptors = payload["descriptors"]
+            expected_descriptor_length = grid_size[0] * grid_size[1] * UNIFORM_LBP_BINS
+            if descriptors.shape[1] != expected_descriptor_length:
+                return False
         except Exception:
             return False
 
-        self.descriptors = payload["descriptors"]
+        self.descriptors = descriptors
         self.student_ids = [str(value) for value in payload["student_ids"].tolist()]
-        self.grid_size = tuple(int(value) for value in payload["grid_size"].tolist())
-        self.backend = "internal-lbp"
+        self.grid_size = grid_size
+        self.backend = "internal-uniform-lbp"
         return True
 
     def _ensure_model_loaded(self) -> None:
         self._load_students()
-        if self.descriptors is not None and self.student_ids and self.backend == "internal-lbp":
+        if self.descriptors is not None and self.student_ids and self.backend == "internal-uniform-lbp":
             return
         if not self.settings.model_path.exists() and not self.settings.fallback_model_path.exists():
             raise FileNotFoundError("Model file not found. Please train the recognizer first.")
