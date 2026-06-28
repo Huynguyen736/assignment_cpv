@@ -24,6 +24,8 @@ def render_live_attendance_page(settings: AppSettings) -> None:
 
     status_placeholder = st.empty()
     info_placeholder = st.empty()
+    show_lbp_debug = st.toggle("Show LBP debug images", value=False)
+    lbp_debug_placeholder = st.empty()
 
     webrtc_ctx = webrtc_streamer(
         key="live-attendance-webrtc",
@@ -46,9 +48,30 @@ def render_live_attendance_page(settings: AppSettings) -> None:
                 status_placeholder.warning(
                     f"Student: - | Name: - | Confidence: {status['confidence']} | Attendance Status: {status['status']}"
                 )
+            reference_lbp_input = status.get("reference_lbp_input")
+            query_lbp_input = status.get("query_lbp_input")
+            if show_lbp_debug and reference_lbp_input is not None and query_lbp_input is not None:
+                with lbp_debug_placeholder.container():
+                    st.caption("LBP input images")
+                    reference_col, query_col = st.columns(2)
+                    reference_col.image(
+                        reference_lbp_input,
+                        caption=f"Registered sample: {status.get('reference_image_path') or '-'}",
+                        channels="GRAY",
+                        use_container_width=True,
+                    )
+                    query_col.image(
+                        query_lbp_input,
+                        caption="Prediction sample",
+                        channels="GRAY",
+                        use_container_width=True,
+                    )
+            else:
+                lbp_debug_placeholder.empty()
             info_placeholder.caption("Camera stream is handled in the WebRTC component to avoid visible page refreshes.")
         else:
             status_placeholder.info("Camera is stopped.")
+            lbp_debug_placeholder.empty()
             info_placeholder.write(
                 {
                     "Student": "",

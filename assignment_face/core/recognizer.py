@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 
 import numpy as np
+import cv2
 
 from assignment_face.config.settings import AppSettings
 from assignment_face.utils.file_utils import load_students
@@ -11,7 +12,7 @@ from assignment_face.utils.image_utils import ensure_grayscale, load_face_image
 
 UNIFORM_LBP_BINS = 59
 NON_UNIFORM_LBP_BIN = UNIFORM_LBP_BINS - 1
-LBP_VARIANT = "uniform-lbp-u2-p8-r1"
+LBP_VARIANT = "uniform-lbp-u2-p8-r1-center-crop-0.76"
 
 
 def _is_uniform_lbp_code(code: int) -> bool:
@@ -36,6 +37,20 @@ def _build_uniform_lbp_lookup() -> np.ndarray:
 
 
 _UNIFORM_LBP_LOOKUP = _build_uniform_lbp_lookup()
+
+
+def prepare_lbp_input(face_image: np.ndarray, crop_ratio: float = 0.76) -> np.ndarray:
+    grayscale = ensure_grayscale(face_image)
+    height, width = grayscale.shape[:2]
+    clamped_ratio = min(max(crop_ratio, 0.5), 1.0)
+    crop_w = max(1, int(round(width * clamped_ratio)))
+    crop_h = max(1, int(round(height * clamped_ratio)))
+    x1 = max(0, (width - crop_w) // 2)
+    y1 = max(0, (height - crop_h) // 2)
+    cropped = grayscale[y1 : y1 + crop_h, x1 : x1 + crop_w]
+    if cropped.shape == grayscale.shape:
+        return cropped.astype(np.uint8)
+    return cv2.resize(cropped, (width, height), interpolation=cv2.INTER_LINEAR).astype(np.uint8)
 
 
 def _compute_lbp_codes(face_image: np.ndarray) -> np.ndarray:
@@ -86,6 +101,9 @@ class RecognitionResult:
     student_name: str | None
     confidence: float
     recognized: bool
+    reference_image_path: str | None = None
+    reference_lbp_input: np.ndarray | None = None
+    query_lbp_input: np.ndarray | None = None
 
 
 class FaceRecognizer:
@@ -94,14 +112,15 @@ class FaceRecognizer:
         self.grid_size = (8, 8)
         self.descriptors: np.ndarray | None = None
         self.student_ids: list[str] = []
+        self.image_paths: list[str] = []
         self.student_names: dict[str, str] = {}
         self.backend = "internal-uniform-lbp"
 
     def _load_students(self) -> None:
         self.student_names = {student["id"]: student["name"] for student in load_students(self.settings.students_path)}
 
-    def _iter_training_images(self) -> list[tuple[str, np.ndarray]]:
-        records: list[tuple[str, np.ndarray]] = []
+    def _iter_training_images(self) -> list[tuple[str, str, np.ndarray]]:
+        records: list[tuple[str, str, np.ndarray]] = []
         for student_dir in sorted(self.settings.face_db_dir.glob("*")):
             if not student_dir.is_dir():
                 continue
@@ -109,7 +128,7 @@ class FaceRecognizer:
                 image = load_face_image(image_path)
                 if image is None:
                     continue
-                records.append((student_dir.name, image))
+                records.append((student_dir.name, str(image_path), image))
         return records
 
     def train(self) -> TrainingResult:
@@ -118,9 +137,10 @@ class FaceRecognizer:
         if not records:
             raise ValueError("No face images found in the face database.")
 
-        self.student_ids = [student_id for student_id, _ in records]
+        self.student_ids = [student_id for student_id, _, _ in records]
+        self.image_paths = [image_path for _, image_path, _ in records]
         self.descriptors = np.vstack(
-            [compute_lbp_descriptor(ensure_grayscale(image), grid_size=self.grid_size) for _, image in records]
+            [compute_lbp_descriptor(prepare_lbp_input(image), grid_size=self.grid_size) for _, _, image in records]
         )
         self.settings.models_dir.mkdir(parents=True, exist_ok=True)
         self.settings.label_map_path.write_text(
@@ -130,6 +150,7 @@ class FaceRecognizer:
         model_payload = {
             "descriptors": self.descriptors,
             "student_ids": np.array(self.student_ids, dtype=object),
+            "image_paths": np.array(self.image_paths, dtype=object),
             "grid_size": np.array(self.grid_size),
             "lbp_variant": np.array(LBP_VARIANT),
         }
@@ -160,6 +181,11 @@ class FaceRecognizer:
 
         self.descriptors = descriptors
         self.student_ids = [str(value) for value in payload["student_ids"].tolist()]
+        if "image_paths" in payload:
+            self.image_paths = [str(value) for value in payload["image_paths"].tolist()]
+        else:
+            records = self._iter_training_images()
+            self.image_paths = [image_path for _, image_path, _ in records] if len(records) == len(self.student_ids) else []
         self.grid_size = grid_size
         self.backend = "internal-uniform-lbp"
         return True
@@ -177,28 +203,37 @@ class FaceRecognizer:
         if not model_loaded and self.settings.fallback_model_path.exists():
             model_loaded = self._load_descriptor_payload(str(self.settings.fallback_model_path))
         if not model_loaded:
-            raise FileNotFoundError("Stored recognizer model is incompatible. Please retrain the recognizer.")
+            self.train()
 
     def recognize(self, face_image: np.ndarray) -> RecognitionResult:
         self._ensure_model_loaded()
-        grayscale_face = ensure_grayscale(face_image)
-        descriptor = compute_lbp_descriptor(grayscale_face, grid_size=self.grid_size)
+        query_lbp_input = prepare_lbp_input(face_image)
+        descriptor = compute_lbp_descriptor(query_lbp_input, grid_size=self.grid_size)
         best_by_student: dict[str, float] = {}
-        for student_id, reference in zip(self.student_ids, self.descriptors, strict=True):
+        best_reference_index_by_student: dict[str, int] = {}
+        for reference_index, (student_id, reference) in enumerate(zip(self.student_ids, self.descriptors, strict=True)):
             distance = _chi_square_distance(descriptor, reference)
             current = best_by_student.get(student_id)
             if current is None or distance < current:
                 best_by_student[student_id] = distance
+                best_reference_index_by_student[student_id] = reference_index
 
         if not best_by_student:
             raise FileNotFoundError("Face descriptor model is unavailable.")
 
         student_id, distance = min(best_by_student.items(), key=lambda item: item[1])
         recognized = distance <= self.settings.confidence_threshold
+        reference_index = best_reference_index_by_student[student_id]
+        reference_image_path = self.image_paths[reference_index] if reference_index < len(self.image_paths) else None
+        reference_image = load_face_image(reference_image_path) if reference_image_path else None
+        reference_lbp_input = prepare_lbp_input(reference_image) if reference_image is not None else None
 
         return RecognitionResult(
             student_id=student_id if recognized else None,
             student_name=self.student_names.get(student_id) if recognized else None,
             confidence=round(float(distance), 4),
             recognized=recognized,
+            reference_image_path=reference_image_path,
+            reference_lbp_input=reference_lbp_input,
+            query_lbp_input=query_lbp_input,
         )

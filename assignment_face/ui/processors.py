@@ -40,6 +40,9 @@ class LiveAttendanceProcessor:
             "confidence": None,
             "status": "Waiting for video",
             "bounding_boxes": [],
+            "reference_image_path": None,
+            "reference_lbp_input": None,
+            "query_lbp_input": None,
         }
         self._lock = Lock()
 

@@ -58,6 +58,11 @@ def build_live_attendance_status(
 
     recognizer = FaceRecognizer(settings)
     prediction = recognizer.recognize(faces[0])
+    debug_images = {
+        "reference_image_path": prediction.reference_image_path,
+        "reference_lbp_input": prediction.reference_lbp_input,
+        "query_lbp_input": prediction.query_lbp_input,
+    }
     if not prediction.recognized:
         return {
             "recognized": False,
@@ -66,6 +71,7 @@ def build_live_attendance_status(
             "confidence": prediction.confidence,
             "status": "Unknown student",
             "bounding_boxes": boxes,
+            **debug_images,
         }
 
     attendance = AttendanceManager(settings.attendance_path)
@@ -81,4 +87,5 @@ def build_live_attendance_status(
         "confidence": prediction.confidence,
         "status": result.status,
         "bounding_boxes": boxes,
+        **debug_images,
     }

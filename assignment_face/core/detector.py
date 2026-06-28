@@ -17,6 +17,9 @@ REFERENCE_FACE_LANDMARKS = np.array(
     dtype=np.float32,
 )
 
+FACE_CROP_EXPANSION = 0.15
+BOX_DISPLAY_EXPANSION = 0.4
+
 
 @dataclass(frozen=True)
 class AlignedFace:
@@ -274,37 +277,25 @@ class HaarCascade:
 
 class FaceDetector:
     def __init__(self, cascade_path, face_size):
-        self.cascade = HaarCascade(str(cascade_path))
+        self.cascade = cv2.CascadeClassifier(str(cascade_path))
+        if self.cascade.empty():
+            raise ValueError(f"Could not load face cascade from {cascade_path}")
         self.face_size = face_size
         self.eye_cascade = _load_cv2_cascade("haarcascade_eye_tree_eyeglasses.xml")
         self.smile_cascade = _load_cv2_cascade("haarcascade_smile.xml")
 
     def detect(self, frame):
         gray = to_grayscale(frame)
-        
-        raw_detections = self.cascade.detect_multi_scale(gray, scale_factor=1.1, step=4)
-        
-        raw_boxes = []
-        for det in raw_detections:
-            x1, y1, x2, y2 = det
-            w = x2 - x1
-            h = y2 - y1
-            if w >= 60 and h >= 60:
-                raw_boxes.append([x1, y1, w, h])
-                
-        boxes = []
-        if len(raw_boxes) > 0:
-            grouped_boxes, weights = cv2.groupRectangles(raw_boxes, groupThreshold=1, eps=0.2)
-            for bbox in grouped_boxes:
-                x = int(bbox[0])
-                y = int(bbox[1])
-                w = int(bbox[2])
-                h = int(bbox[3])
-                boxes.append((x, y, w, h))
+        raw_boxes = self.cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(60, 60))
+        boxes = [(int(x), int(y), int(w), int(h)) for x, y, w, h in raw_boxes]
 
         faces = []
         for x, y, w, h in boxes:
-            expanded_x, expanded_y, expanded_w, expanded_h = expand_bounding_box((x, y, w, h), gray.shape, expansion=0.4)
+            expanded_x, expanded_y, expanded_w, expanded_h = expand_bounding_box(
+                (x, y, w, h),
+                gray.shape,
+                expansion=FACE_CROP_EXPANSION,
+            )
             face_crop = gray[expanded_y : expanded_y + expanded_h, expanded_x : expanded_x + expanded_w]
             landmarks = detect_five_landmarks(face_crop, self.eye_cascade, self.smile_cascade)
             if landmarks is not None:
@@ -313,5 +304,5 @@ class FaceDetector:
                 face_img = cv2.resize(face_crop, self.face_size)
             faces.append(face_img)
             
-        expanded_boxes = [expand_bounding_box(box, gray.shape, expansion=0.4) for box in boxes]
+        expanded_boxes = [expand_bounding_box(box, gray.shape, expansion=BOX_DISPLAY_EXPANSION) for box in boxes]
         return faces, expanded_boxes
