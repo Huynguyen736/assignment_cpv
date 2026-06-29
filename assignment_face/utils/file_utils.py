@@ -62,6 +62,28 @@ def upsert_student(path: Path, student_id: str, student_name: str) -> dict[str, 
     return normalized
 
 
+def delete_student(path: Path, student_id: str) -> bool:
+    """Remove a student from students.json by ID. Returns True if found and removed."""
+    students = load_students(path)
+    original_count = len(students)
+    students = [s for s in students if str(s.get("id")) != student_id]
+    if len(students) == original_count:
+        return False
+    save_students(path, students)
+    return True
+
+
+def update_student_name(path: Path, student_id: str, new_name: str) -> bool:
+    """Update a student's name in students.json. Returns True if found and updated."""
+    students = load_students(path)
+    for student in students:
+        if str(student.get("id")) == student_id:
+            student["name"] = new_name
+            save_students(path, students)
+            return True
+    return False
+
+
 def load_attendance_rows(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         return []
