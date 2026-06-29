@@ -1,4 +1,8 @@
 StudentID,StudentName,Date,Time,Confidence
 HE200031,Nguyễn Nhật Huy,2026-06-28,11:08:20,9.95
+<<<<<<< Updated upstream
 HE200031,Nguyễn Nhật Huy,2026-06-29,13:13:16,74.29
 HE201755,Ngô Văn Gia Bảo,2026-06-29,13:15:20,75.42
+=======
+HE200725,,2026-06-29,13:16:34,89.13
+>>>>>>> Stashed changes
