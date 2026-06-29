@@ -205,28 +205,60 @@ class FaceRecognizer:
         if not model_loaded:
             self.train()
 
-    def recognize(self, face_image: np.ndarray) -> RecognitionResult:
+    def recognize(self, face_image: np.ndarray, top_k: int = 5) -> RecognitionResult:
         self._ensure_model_loaded()
+
         query_lbp_input = prepare_lbp_input(face_image)
         descriptor = compute_lbp_descriptor(query_lbp_input, grid_size=self.grid_size)
-        best_by_student: dict[str, float] = {}
-        best_reference_index_by_student: dict[str, int] = {}
-        for reference_index, (student_id, reference) in enumerate(zip(self.student_ids, self.descriptors, strict=True)):
-            distance = _chi_square_distance(descriptor, reference)
-            current = best_by_student.get(student_id)
-            if current is None or distance < current:
-                best_by_student[student_id] = distance
-                best_reference_index_by_student[student_id] = reference_index
 
-        if not best_by_student:
+        distances_by_student: dict[str, list[tuple[float, int]]] = {}
+
+        for reference_index, (student_id, reference) in enumerate(
+            zip(self.student_ids, self.descriptors, strict=True)
+        ):
+            distance = _chi_square_distance(descriptor, reference)
+
+            if student_id not in distances_by_student:
+                distances_by_student[student_id] = []
+
+            distances_by_student[student_id].append((distance, reference_index))
+
+        if not distances_by_student:
             raise FileNotFoundError("Face descriptor model is unavailable.")
 
-        student_id, distance = min(best_by_student.items(), key=lambda item: item[1])
+        mean_distances_by_student: dict[str, float] = {}
+        best_reference_index_by_student: dict[str, int] = {}
+
+        for student_id, items in distances_by_student.items():
+            items = sorted(items, key=lambda item: item[0])
+            top_items = items[:top_k]
+
+            mean_distances_by_student[student_id] = float(
+                np.mean([distance for distance, _ in top_items])
+            )
+
+            best_reference_index_by_student[student_id] = top_items[0][1]
+
+        student_id, distance = min(
+            mean_distances_by_student.items(),
+            key=lambda item: item[1],
+        )
+
         recognized = distance <= (100 - self.settings.confidence_threshold)
+
         reference_index = best_reference_index_by_student[student_id]
-        reference_image_path = self.image_paths[reference_index] if reference_index < len(self.image_paths) else None
+        reference_image_path = (
+            self.image_paths[reference_index]
+            if reference_index < len(self.image_paths)
+            else None
+        )
+
         reference_image = load_face_image(reference_image_path) if reference_image_path else None
-        reference_lbp_input = prepare_lbp_input(reference_image) if reference_image is not None else None
+        reference_lbp_input = (
+            prepare_lbp_input(reference_image)
+            if reference_image is not None
+            else None
+        )
 
         return RecognitionResult(
             student_id=student_id if recognized else None,
