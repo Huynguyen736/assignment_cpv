@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pathlib import Path
 import cv2
 import numpy as np
@@ -21,39 +20,37 @@ FACE_CROP_EXPANSION = 0.15
 BOX_DISPLAY_EXPANSION = 0.4
 
 
-@dataclass(frozen=True)
 class AlignedFace:
-    image: np.ndarray
-    transform_matrix: np.ndarray
+    def __init__(self, image, transform_matrix):
+        self.image = image
+        self.transform_matrix = transform_matrix
 
-    def transform_landmarks(self, landmarks: np.ndarray) -> np.ndarray:
+    def transform_landmarks(self, landmarks):
         points = np.asarray(landmarks, dtype=np.float32)
         homogeneous = np.column_stack([points, np.ones(points.shape[0], dtype=np.float32)])
-        return homogeneous @ self.transform_matrix.T
+        return np.dot(homogeneous, self.transform_matrix.T)
 
 
 def expand_bounding_box(
-    box: tuple[int, int, int, int],
-    image_shape: tuple[int, ...],
-    expansion: float = 0.4,
-) -> tuple[int, int, int, int]:
+    box,
+    image_shape,
+    expansion=0.4,
+):
     x, y, w, h = box
     image_h, image_w = image_shape[:2]
     pad_x = int(round(w * expansion / 2.0))
     pad_y = int(round(h * expansion / 2.0))
-
     x1 = max(0, x - pad_x)
     y1 = max(0, y - pad_y)
     x2 = min(image_w, x + w + pad_x)
     y2 = min(image_h, y + h + pad_y)
     return (x1, y1, max(1, x2 - x1), max(1, y2 - y1))
 
-
 def align_face_with_landmarks(
-    face_crop: np.ndarray,
-    landmarks: np.ndarray,
-    output_size: tuple[int, int],
-) -> AlignedFace:
+    face_crop,
+    landmarks,
+    output_size,
+):
     output_w, output_h = output_size
     source_landmarks = np.asarray(landmarks, dtype=np.float32)
     target_landmarks = REFERENCE_FACE_LANDMARKS * np.array([output_w, output_h], dtype=np.float32)
@@ -71,36 +68,37 @@ def align_face_with_landmarks(
     return AlignedFace(image=aligned, transform_matrix=transform_matrix.astype(np.float32))
 
 
-def _cascade_path(name: str) -> str:
-    return str(Path(cv2.data.haarcascades) / name)
+def _cascade_path(name):
+    return str(Path(__file__).parent.parent / "models" / name)
 
 
-def _load_cv2_cascade(name: str) -> cv2.CascadeClassifier:
+def _load_cascade(name):
     return cv2.CascadeClassifier(_cascade_path(name))
 
 
-def _largest_box(boxes: np.ndarray | tuple, x_offset: int = 0, y_offset: int = 0) -> tuple[int, int, int, int] | None:
+def _largest_box(boxes, x_offset=0, y_offset=0):
     if boxes is None or len(boxes) == 0:
         return None
     x, y, w, h = max(boxes, key=lambda box: int(box[2]) * int(box[3]))
     return (int(x) + x_offset, int(y) + y_offset, int(w), int(h))
 
 
-def _box_center(box: tuple[int, int, int, int]) -> tuple[float, float]:
+def _box_center(box):
     x, y, w, h = box
     return (x + w / 2.0, y + h / 2.0)
 
 
 def _detect_eye_landmarks(
-    gray_crop: np.ndarray,
-    eye_cascade: cv2.CascadeClassifier,
-) -> tuple[tuple[float, float], tuple[float, float]] | None:
+    gray_crop,
+    eye_cascade,
+):
     crop_h, crop_w = gray_crop.shape[:2]
     upper_face = gray_crop[: max(1, int(crop_h * 0.65)), :]
-    eyes = eye_cascade.detectMultiScale(upper_face, scaleFactor=1.1, minNeighbors=4, minSize=(12, 12))
+    raw_eyes = eye_cascade.detectMultiScale(upper_face, scaleFactor=1.1)
+    eyes = [(int(x), int(y), int(w), int(h)) for x, y, w, h in raw_eyes]
     eye_boxes = sorted(eyes, key=lambda box: int(box[2]) * int(box[3]), reverse=True)
 
-    candidates: list[tuple[float, float]] = []
+    candidates = []
     for box in eye_boxes:
         center_x, center_y = _box_center(tuple(int(value) for value in box))
         if 0.12 * crop_w <= center_x <= 0.88 * crop_w:
@@ -117,13 +115,14 @@ def _detect_eye_landmarks(
 
 
 def _detect_mouth_landmarks(
-    gray_crop: np.ndarray,
-    smile_cascade: cv2.CascadeClassifier,
-) -> tuple[tuple[float, float], tuple[float, float]] | None:
+    gray_crop,
+    smile_cascade,
+):
     crop_h = gray_crop.shape[0]
     lower_start = int(crop_h * 0.48)
     lower_face = gray_crop[lower_start:, :]
-    smiles = smile_cascade.detectMultiScale(lower_face, scaleFactor=1.2, minNeighbors=12, minSize=(18, 8))
+    raw_smiles = smile_cascade.detectMultiScale(lower_face, scaleFactor=1.2)
+    smiles = [(int(x), int(y), int(w), int(h)) for x, y, w, h in raw_smiles]
     mouth_box = _largest_box(smiles, y_offset=lower_start)
     if mouth_box is None:
         return None
@@ -133,12 +132,8 @@ def _detect_mouth_landmarks(
     return (x + w * 0.15, mouth_y), (x + w * 0.85, mouth_y)
 
 
-def detect_five_landmarks(
-    gray_crop: np.ndarray,
-    eye_cascade: cv2.CascadeClassifier,
-    smile_cascade: cv2.CascadeClassifier,
-) -> np.ndarray | None:
-    if eye_cascade.empty() or smile_cascade.empty():
+def detect_five_landmarks(gray_crop, eye_cascade, smile_cascade):
+    if eye_cascade is None or smile_cascade is None:
         return None
 
     eyes = _detect_eye_landmarks(gray_crop, eye_cascade)
@@ -169,124 +164,16 @@ def detect_five_landmarks(
     return landmarks
 
 
-class HaarCascade:
-    def __init__(self, xml_path):
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
-        cascade = root.find('cascade')
-        
-        self.win_w = int(cascade.find('width').text)
-        self.win_h = int(cascade.find('height').text)
-        self.win_area = self.win_w * self.win_h
-        
-        stages_node = cascade.find('stages')
-        self.stages = []
-        for stage in stages_node.findall('_'):
-            stage_threshold = float(stage.find('stageThreshold').text)
-            weaks = []
-            for weak in stage.find('weakClassifiers').findall('_'):
-                internal = weak.find('internalNodes').text.strip().split()
-                feature_idx = int(internal[2])
-                threshold = float(internal[3])
-                
-                leafs = weak.find('leafValues').text.strip().split()
-                left_val = float(leafs[0])
-                right_val = float(leafs[1])
-                
-                weaks.append((feature_idx, threshold, left_val, right_val))
-            self.stages.append((stage_threshold, weaks))
-            
-        features_node = cascade.find('features')
-        self.features = []
-        for feat in features_node.findall('_'):
-            rects = []
-            for rect in feat.find('rects').findall('_'):
-                r = list(map(float, rect.text.strip().split()))
-                rects.append(r)
-            self.features.append(rects)
-
-    def compute_integral_images(self, img):
-        img_float = img.astype(np.float64)
-        integral = img_float
-        sq_integral = img_float ** 2
-        return integral, sq_integral
-
-    def get_region_sum(self, img_array, x, y, w, h):
-        x_start = int(x)
-        y_start = int(y)
-        x_end = int(x + w)
-        y_end = int(y + h)
-        sum_val = 0.0
-        for i in range(y_start, y_end):
-            for j in range(x_start, x_end):
-                sum_val += img_array[i, j]    
-        return sum_val
-
-    def detect_multi_scale(self, img, scale_factor=1.2, step=4):
-        h_img, w_img = img.shape
-        detections = []
-        scale = 1.0
-        while True:
-            resized_w = int(w_img / scale)
-            resized_h = int(h_img / scale)
-            
-            if resized_w < self.win_w or resized_h < self.win_h:
-                break
-                
-            resized_img = cv2.resize(img, (resized_w, resized_h))
-            integral, sq_integral = self.compute_integral_images(resized_img)
-            
-            for y in range(0, resized_h - self.win_h, step):
-                for x in range(0, resized_w - self.win_w, step):
-                    win_sum = self.get_region_sum(integral, x, y, self.win_w, self.win_h)
-                    win_sq_sum = self.get_region_sum(sq_integral, x, y, self.win_w, self.win_h)
-                    mean = win_sum / self.win_area
-                    variance = (win_sq_sum / self.win_area) - (mean ** 2)
-                    std_dev = np.sqrt(variance) if variance > 0 else 1.0             
-                    passed_all_stages = True
-                    for stage_threshold, weaks in self.stages:
-                        stage_sum = 0.0
-                        for feature_idx, weak_thresh, left_val, right_val in weaks:
-                            rects = self.features[feature_idx]
-                            feat_val = 0.0
-                            for rx, ry, rw, rh, weight in rects:
-                                r_sum = self.get_region_sum(integral, x + rx, y + ry, rw, rh)
-                                feat_val += r_sum * weight
-                                
-                            feat_val = feat_val / self.win_area
-                            if feat_val < weak_thresh * std_dev:
-                                stage_sum += left_val
-                            else:
-                                stage_sum += right_val
-                                
-                        if stage_sum < stage_threshold:
-                            passed_all_stages = False
-                            break
-                            
-                    if passed_all_stages:
-                        orig_x = int(x * scale)
-                        orig_y = int(y * scale)
-                        orig_w = int(self.win_w * scale)
-                        orig_h = int(self.win_h * scale)
-                        detections.append([orig_x, orig_y, orig_x + orig_w, orig_y + orig_h])
-                        
-            scale *= scale_factor
-            
-        return detections
-
-
 class FaceDetector:
     def __init__(self, cascade_path, face_size):
         self.cascade = cv2.CascadeClassifier(str(cascade_path))
-        if self.cascade.empty():
-            raise ValueError(f"Could not load face cascade from {cascade_path}")
         self.face_size = face_size
-        self.eye_cascade = _load_cv2_cascade("haarcascade_eye_tree_eyeglasses.xml")
-        self.smile_cascade = _load_cv2_cascade("haarcascade_smile.xml")
+        self.eye_cascade = _load_cascade("haarcascade_eye_tree_eyeglasses.xml")
+        self.smile_cascade = _load_cascade("haarcascade_smile.xml")
 
     def detect(self, frame):
         gray = to_grayscale(frame)
-        raw_boxes = self.cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(60, 60))
+        raw_boxes = self.cascade.detectMultiScale(gray, scaleFactor=1.1)
         boxes = [(int(x), int(y), int(w), int(h)) for x, y, w, h in raw_boxes]
 
         faces = []
