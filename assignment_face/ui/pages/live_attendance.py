@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from assignment_face.config.settings import AppSettings
+from assignment_face.core.camera import camera_player_factory
 from assignment_face.ui.processors import LiveAttendanceProcessor
 
 try:
@@ -29,8 +30,8 @@ def render_live_attendance_page(settings: AppSettings) -> None:
 
     webrtc_ctx = webrtc_streamer(
         key="live-attendance-webrtc",
-        mode=WebRtcMode.SENDRECV,
-        media_stream_constraints={"video": True, "audio": False},
+        mode=WebRtcMode.RECVONLY,
+        player_factory=camera_player_factory(settings),
         video_processor_factory=lambda: LiveAttendanceProcessor(settings),
         async_processing=True,
     )
