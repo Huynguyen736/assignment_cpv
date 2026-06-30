@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import time
 from collections import deque
-from threading import Lock
-from typing import Any
+from threading import Event, Lock, Thread
+from typing import Any, Callable
 
 import cv2
 import numpy as np
@@ -30,9 +30,43 @@ def _annotate_frame(
     return annotated
 
 
+class BackgroundTask:
+    def __init__(self, target: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
+        self._done = Event()
+        self._lock = Lock()
+        self._result: Any = None
+        self._error: BaseException | None = None
+        self._thread = Thread(target=self._run, args=(target, args, kwargs), daemon=True)
+        self._thread.start()
+
+    def _run(self, target: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]) -> None:
+        try:
+            result = target(*args, **kwargs)
+        except BaseException as exc:  # pragma: no cover - defensive UI surface
+            with self._lock:
+                self._error = exc
+        else:
+            with self._lock:
+                self._result = result
+        finally:
+            self._done.set()
+
+    def done(self) -> bool:
+        return self._done.is_set()
+
+    def result(self) -> Any:
+        if not self.done():
+            raise RuntimeError("Background task is still running.")
+        with self._lock:
+            if self._error is not None:
+                raise self._error
+            return self._result
+
+
 class LiveAttendanceProcessor:
-    def __init__(self, settings: AppSettings) -> None:
+    def __init__(self, settings: AppSettings, processing_interval_seconds: float = 0.25) -> None:
         self.settings = settings
+        self.processing_interval_seconds = processing_interval_seconds
         self.last_status: dict[str, Any] = {
             "recognized": False,
             "student_id": None,
@@ -45,6 +79,58 @@ class LiveAttendanceProcessor:
             "query_lbp_input": None,
         }
         self._lock = Lock()
+        self._pending_frame: np.ndarray | None = None
+        self._frame_available = Event()
+        self._stop_requested = Event()
+        self._worker = Thread(target=self._run_status_worker, daemon=True)
+        self._worker.start()
+
+    def _schedule_frame(self, frame: np.ndarray) -> None:
+        with self._lock:
+            self._pending_frame = frame.copy()
+        self._frame_available.set()
+
+    def _take_latest_frame(self) -> np.ndarray | None:
+        with self._lock:
+            frame = self._pending_frame
+            self._pending_frame = None
+            self._frame_available.clear()
+            return frame
+
+    def _set_status(self, status: dict[str, Any]) -> None:
+        with self._lock:
+            self.last_status = status
+
+    def _run_status_worker(self) -> None:
+        last_processed_at = 0.0
+        while not self._stop_requested.is_set():
+            if not self._frame_available.wait(0.1):
+                continue
+
+            wait_time = self.processing_interval_seconds - (time.monotonic() - last_processed_at)
+            if wait_time > 0 and self._stop_requested.wait(wait_time):
+                break
+
+            frame = self._take_latest_frame()
+            if frame is None:
+                continue
+
+            last_processed_at = time.monotonic()
+            try:
+                status = build_live_attendance_status(settings=self.settings, frame=frame)
+            except Exception as exc:  # pragma: no cover - defensive UI surface
+                status = {
+                    "recognized": False,
+                    "student_id": None,
+                    "student_name": None,
+                    "confidence": None,
+                    "status": f"Processing error: {exc}",
+                    "bounding_boxes": [],
+                    "reference_image_path": None,
+                    "reference_lbp_input": None,
+                    "query_lbp_input": None,
+                }
+            self._set_status(status)
 
     def process_ndarray(
         self,
@@ -52,17 +138,25 @@ class LiveAttendanceProcessor:
         detected_faces: list[np.ndarray] | None = None,
         bounding_boxes: list[tuple[int, int, int, int]] | None = None,
     ) -> np.ndarray:
-        status = build_live_attendance_status(
-            settings=self.settings,
-            frame=frame,
-            detected_faces=detected_faces,
-            bounding_boxes=bounding_boxes,
+        if detected_faces is None and bounding_boxes is None:
+            self._schedule_frame(frame)
+            status = self.get_status()
+        else:
+            status = build_live_attendance_status(
+                settings=self.settings,
+                frame=frame,
+                detected_faces=detected_faces,
+                bounding_boxes=bounding_boxes,
+            )
+            self._set_status(status)
+
+        color = (0, 180, 0) if status.get("recognized") else (0, 165, 255)
+        return _annotate_frame(
+            frame,
+            status.get("bounding_boxes", []),
+            status.get("status", "Processing video"),
+            color,
         )
-        color = (0, 180, 0) if status["recognized"] else (0, 165, 255)
-        annotated = _annotate_frame(frame, status["bounding_boxes"], status["status"], color)
-        with self._lock:
-            self.last_status = status
-        return annotated
 
     def recv(self, frame: "av.VideoFrame") -> "av.VideoFrame":
         if av is None:
@@ -75,6 +169,11 @@ class LiveAttendanceProcessor:
     def get_status(self) -> dict[str, Any]:
         with self._lock:
             return dict(self.last_status)
+
+    def stop(self) -> None:
+        self._stop_requested.set()
+        self._frame_available.set()
+        self._worker.join(timeout=1.0)
 
 
 class RegistrationRecorderProcessor:

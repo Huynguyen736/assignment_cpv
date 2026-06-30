@@ -9,6 +9,7 @@ def create_recording_capture_state(duration_seconds: int = 10, frames_per_second
         "frames_per_second": frames_per_second,
         "started_at": None,
         "recording": False,
+        "processing": False,
         "processed": False,
         "saved_images": [],
         "captured_total": 0,

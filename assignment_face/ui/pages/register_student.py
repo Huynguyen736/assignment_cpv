@@ -4,7 +4,7 @@ import time
 
 from assignment_face.config.settings import AppSettings
 from assignment_face.services.registration import process_registration_recording
-from assignment_face.ui.processors import RegistrationRecorderProcessor
+from assignment_face.ui.processors import BackgroundTask, RegistrationRecorderProcessor
 from assignment_face.ui.state import create_recording_capture_state, create_registration_ui_state
 
 try:
@@ -41,6 +41,8 @@ def render_register_student_page(settings: AppSettings) -> None:
         st.session_state.registration_student_id = ""
     if "registration_student_name" not in st.session_state:
         st.session_state.registration_student_name = ""
+    if "registration_processing_job" not in st.session_state:
+        st.session_state.registration_processing_job = None
 
     camera_col, capture_col = st.columns(2)
 
@@ -62,6 +64,7 @@ def render_register_student_page(settings: AppSettings) -> None:
         disabled=(
             not st.session_state.registration_ui_state["capture_enabled"]
             or st.session_state.registration_capture_state["recording"]
+            or st.session_state.registration_capture_state.get("processing", False)
         ),
     ):
         if not student_id.strip() or not student_name.strip():
@@ -75,11 +78,11 @@ def render_register_student_page(settings: AppSettings) -> None:
         st.session_state.registration_capture_state["processed"] = False
         st.session_state.registration_capture_state["saved_images"] = []
         st.session_state.registration_capture_state["captured_total"] = 0
+        st.session_state.registration_processing_job = None
         st.session_state.registration_feedback = "Dang quay video 10 giay. Hay di chuyen khuon mat tu nhien trong khung hinh."
 
     feedback_placeholder = st.empty()
     progress_placeholder = st.empty()
-    preview_placeholder = st.empty()
 
     webrtc_ctx = webrtc_streamer(
         key="register-attendance-webrtc",
@@ -93,11 +96,43 @@ def render_register_student_page(settings: AppSettings) -> None:
     @st.fragment(run_every=0.3)
     def render_registration_status_fragment() -> None:
         capture_state = st.session_state.registration_capture_state
-        if st.session_state.registration_ui_state["camera_enabled"] and webrtc_ctx.state.playing and webrtc_ctx.video_processor:
-            preview_frame = webrtc_ctx.video_processor.get_preview_frame()
-            if preview_frame.size > 0:
-                preview_placeholder.image(preview_frame[:, :, ::-1], channels="RGB", use_container_width=True)
+        capture_state.setdefault("processing", False)
+        processing_job = st.session_state.registration_processing_job
 
+        if capture_state["processing"]:
+            if processing_job is not None and processing_job.done():
+                try:
+                    result = processing_job.result()
+                except Exception as exc:  # pragma: no cover - defensive UI surface
+                    result = {
+                        "ok": False,
+                        "message": f"Registration processing failed: {exc}",
+                        "saved_images": [],
+                        "captured_total": 0,
+                    }
+                capture_state["recording"] = False
+                capture_state["processing"] = False
+                capture_state["processed"] = True
+                capture_state["saved_images"] = result.get("saved_images", [])
+                capture_state["captured_total"] = result.get("captured_total", 0)
+                st.session_state.registration_processing_job = None
+                st.session_state.registration_feedback = result["message"]
+                if result["ok"]:
+                    feedback_placeholder.success(result["message"])
+                else:
+                    feedback_placeholder.warning(result["message"])
+                progress_placeholder.write(
+                    {
+                        "Captured total": capture_state["captured_total"],
+                        "Saved images": capture_state["saved_images"],
+                    }
+                )
+            else:
+                feedback_placeholder.info("Dang xu ly video da quay. Camera van tiep tuc hien thi trong WebRTC.")
+                progress_placeholder.progress(1.0)
+            return
+
+        if st.session_state.registration_ui_state["camera_enabled"] and webrtc_ctx.state.playing and webrtc_ctx.video_processor:
             if capture_state["recording"] and capture_state["started_at"] is not None:
                 elapsed = time.monotonic() - float(capture_state["started_at"])
                 remaining = max(0.0, float(capture_state["duration_seconds"]) - elapsed)
@@ -108,7 +143,8 @@ def render_register_student_page(settings: AppSettings) -> None:
                     recorded_frames = webrtc_ctx.video_processor.get_recent_recording(
                         duration_seconds=int(capture_state["duration_seconds"])
                     )
-                    result = process_registration_recording(
+                    st.session_state.registration_processing_job = BackgroundTask(
+                        process_registration_recording,
                         settings=settings,
                         student_id=st.session_state.registration_student_id,
                         student_name=st.session_state.registration_student_name,
@@ -117,14 +153,10 @@ def render_register_student_page(settings: AppSettings) -> None:
                         frames_per_second=int(capture_state["frames_per_second"]),
                     )
                     capture_state["recording"] = False
-                    capture_state["processed"] = True
-                    capture_state["saved_images"] = result.get("saved_images", [])
-                    capture_state["captured_total"] = result.get("captured_total", 0)
-                    st.session_state.registration_feedback = result["message"]
-                    if result["ok"]:
-                        feedback_placeholder.success(result["message"])
-                    else:
-                        feedback_placeholder.warning(result["message"])
+                    capture_state["processing"] = True
+                    st.session_state.registration_feedback = "Dang xu ly video da quay."
+                    feedback_placeholder.info(st.session_state.registration_feedback)
+                    progress_placeholder.progress(1.0)
             else:
                 feedback_placeholder.write(st.session_state.registration_feedback)
                 progress_placeholder.write(

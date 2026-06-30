@@ -16,8 +16,11 @@ def sample_recording_frames(
             continue
 
         max_items = min(frames_per_second, len(bucket))
-        step = len(bucket) / max_items
-        positions = [int(i * step) for i in range(max_items)]
+        if max_items == 1:
+            positions = [0]
+        else:
+            last_index = len(bucket) - 1
+            positions = [round(i * last_index / (max_items - 1)) for i in range(max_items)]
         for position in positions:
             sampled.append(bucket[position])
 
