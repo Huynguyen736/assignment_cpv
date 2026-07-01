@@ -132,7 +132,6 @@ def _detect_eye_landmarks(
     raw_eyes = eye_cascade.detect_multi_scale(upper_face, scale_factor=1.1)
     eyes = [(x1, y1, x2-x1, y2-y1) for x1, y1, x2, y2 in raw_eyes]
     eye_boxes = sorted(eyes, key=lambda box: int(box[2]) * int(box[3]), reverse=True)
-
     candidates = []
     for box in eye_boxes:
         center_x, center_y = _box_center(tuple(int(value) for value in box))
