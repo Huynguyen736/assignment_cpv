@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from assignment_face.config.settings import AppSettings
-from assignment_face.core.camera import camera_player_factory
 from assignment_face.ui.processors import LiveAttendanceProcessor
+from assignment_face.ui.shared_camera import shared_camera_player_factory
 
 try:
     import av
@@ -17,7 +17,14 @@ def render_live_attendance_page(settings: AppSettings) -> None:
     import streamlit as st
 
     st.title("Live Attendance")
-    st.write("Use the live WebRTC stream below to detect faces, recognize students, and record attendance without page reruns.")
+
+    # Show which camera source is active
+    if settings.rtsp_url:
+        st.info(f"📱 Nguồn camera: RTSP → `{settings.rtsp_url}` (fallback: webcam nếu RTSP lỗi)")
+    else:
+        st.info("💻 Nguồn camera: Webcam laptop (chưa cấu hình RTSP_URL)")
+
+    st.write("Luồng video bên dưới dùng camera RTSP/webcam phía server để nhận diện khuôn mặt và ghi điểm danh.")
 
     if webrtc_streamer is None or av is None or WebRtcMode is None:
         st.error("streamlit-webrtc is not installed. Install dependencies again to enable stable live streaming.")
@@ -31,7 +38,7 @@ def render_live_attendance_page(settings: AppSettings) -> None:
     webrtc_ctx = webrtc_streamer(
         key="live-attendance-webrtc",
         mode=WebRtcMode.RECVONLY,
-        player_factory=camera_player_factory(settings),
+        player_factory=shared_camera_player_factory(settings),
         video_processor_factory=lambda: LiveAttendanceProcessor(settings),
         async_processing=True,
     )

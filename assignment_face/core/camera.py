@@ -38,11 +38,11 @@ class Camera:
         capture_factory: Callable[[object], Capture] | None = None,
         open_attempts: int = 3,
         retry_delay_seconds: float = 0.05,
-        open_timeout_seconds: float = 2.0,
-        read_timeout_seconds: float = 1.0,
+        open_timeout_seconds: float = 10.0,
+        read_timeout_seconds: float = 5.0,
     ) -> None:
         self.settings = settings
-        self.capture_factory = capture_factory or cv2.VideoCapture
+        self.capture_factory = capture_factory or self._default_capture_factory
         self.open_attempts = max(1, open_attempts)
         self.retry_delay_seconds = max(0.0, retry_delay_seconds)
         self.open_timeout_seconds = max(0.01, open_timeout_seconds)
@@ -50,6 +50,21 @@ class Camera:
         self.capture: Capture | None = None
         self.source: str | None = None
         self._first_frame: np.ndarray | None = None
+        # Lock prevents concurrent cap.read() calls from asyncio threads,
+        # which causes libavcodec assertion failures in FFmpeg.
+        self._read_lock = Lock()
+
+    @staticmethod
+    def _default_capture_factory(source: object) -> "cv2.VideoCapture":
+        """Open camera with FFMPEG backend hint for RTSP URLs."""
+        if isinstance(source, str) and source.startswith("rtsp"):
+            cap = cv2.VideoCapture(source, cv2.CAP_FFMPEG)
+            # Limit internal FFmpeg decode threads to 1 to avoid
+            # pthread_frame assertion errors under multi-threaded access.
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        else:
+            cap = cv2.VideoCapture(source)  # type: ignore[arg-type]
+        return cap
 
     def start(self) -> str:
         if self.capture is not None and self.source is not None:
@@ -76,28 +91,30 @@ class Camera:
         raise RuntimeError("Unable to connect to RTSP camera or fallback webcam.")
 
     def read(self) -> tuple[bool, np.ndarray]:
-        if self.capture is None:
-            self.start()
+        with self._read_lock:
+            if self.capture is None:
+                self.start()
 
-        if self._first_frame is not None:
-            frame = self._first_frame
-            self._first_frame = None
+            if self._first_frame is not None:
+                frame = self._first_frame
+                self._first_frame = None
+                return True, self._resize_frame(frame)
+
+            if self.capture is None:
+                return False, self._blank_frame()
+
+            ok, frame = self.capture.read()
+            if not ok or frame is None:
+                return False, self._blank_frame()
             return True, self._resize_frame(frame)
 
-        if self.capture is None:
-            return False, self._blank_frame()
-
-        ok, frame = self.capture.read()
-        if not ok or frame is None:
-            return False, self._blank_frame()
-        return True, self._resize_frame(frame)
-
     def release(self) -> None:
-        if self.capture is not None:
-            self.capture.release()
-        self.capture = None
-        self.source = None
-        self._first_frame = None
+        with self._read_lock:
+            if self.capture is not None:
+                self.capture.release()
+            self.capture = None
+            self.source = None
+            self._first_frame = None
 
     def _source_candidates(self) -> list[tuple[str, object]]:
         candidates: list[tuple[str, object]] = []

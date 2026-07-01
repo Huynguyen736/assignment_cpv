@@ -3,9 +3,9 @@ from __future__ import annotations
 import time
 
 from assignment_face.config.settings import AppSettings
-from assignment_face.core.camera import camera_player_factory
 from assignment_face.services.registration import process_registration_recording
 from assignment_face.ui.processors import BackgroundTask, RegistrationRecorderProcessor
+from assignment_face.ui.shared_camera import shared_camera_player_factory
 from assignment_face.ui.state import create_recording_capture_state, create_registration_ui_state
 
 try:
@@ -88,7 +88,7 @@ def render_register_student_page(settings: AppSettings) -> None:
     webrtc_ctx = webrtc_streamer(
         key="register-attendance-webrtc",
         mode=WebRtcMode.RECVONLY,
-        player_factory=camera_player_factory(settings),
+        player_factory=shared_camera_player_factory(settings),
         desired_playing_state=st.session_state.registration_ui_state["camera_enabled"],
         video_processor_factory=lambda: RegistrationRecorderProcessor(settings),
         async_processing=True,
